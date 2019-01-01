@@ -1,0 +1,35 @@
+{
+    "name": "ndphp/fastadmin-addons",
+    "description": "addons package for fastadmin",
+    "homepage": "https://github.com/ndphp/fastadmin-addons",
+    "license": "Apache-2.0",
+    "minimum-stability": "dev",
+    "version": "2.0.0",
+    "authors": [
+        {
+            "name": "youwo",
+            "email": "youwo@foxmail.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/ndphp/fastadmin-addons/issues"
+    },
+    "require": {
+        "php": ">=5.6.0",
+        "topthink/think-helper": ">=1.0.4",
+        "topthink/think-installer": ">=1.0.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "think\\": "src/"
+        },
+        "files": [
+            "src/helper.php"
+        ]
+    },
+    "extra": {
+        "think-config": {
+            "addons": "src/config.php"
+        }
+    }
+}
