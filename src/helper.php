@@ -7,6 +7,7 @@ use think\Exception;
 use think\facade\Hook;
 use think\Loader;
 use think\facade\Route;
+use think\facade\Request;
 use think\facade\Env;
 
 // 插件目录
@@ -78,6 +79,7 @@ Hook::add('app_init', function () {
 
     // 获取系统配置
     $hooks = App::isDebug() ? [] : Cache::get('hooks', []);
+
     if (empty($hooks)) {
         $hooks = (array)Config::get('addons.hooks');
         // 初始化钩子
@@ -94,9 +96,10 @@ Hook::add('app_init', function () {
     //如果在插件中有定义app_init，则直接执行
     if (isset($hooks['app_init'])) {
         foreach ($hooks['app_init'] as $k => $v) {
-            Hook::exec($v, 'app_init');
+            Hook::exec([$v, 'appInit']);
         }
     }
+
     Hook::import($hooks, true);
 });
 
@@ -324,11 +327,8 @@ function addon_url($url, $vars = [], $suffix = true, $domain = false)
     }
     $val = "@addons/{$url}";
     $config = get_addon_config($addon);
-    // 没数据测试，可能存在错误
-    // $dispatch = think\facade\Request::dispatch();
-    // $indomain = isset($dispatch['var']['indomain']) && $dispatch['var']['indomain'] ? true : false;
-    $routeInfo = think\facade\Request::routeInfo();
-    $indomain = isset($routeInfo['var']['indomain']) && $routeInfo['var']['indomain'] ? true : false;
+    $dispatch = Request::dispatch()->getDispatch();
+    $indomain = isset($dispatch['var']['indomain']) && $dispatch['var']['indomain'] ? true : false;
     $domainprefix = $config && isset($config['domain']) && $config['domain'] ? $config['domain'] : '';
     $rewrite = $config && isset($config['rewrite']) && $config['rewrite'] ? $config['rewrite'] : [];
     if ($rewrite) {

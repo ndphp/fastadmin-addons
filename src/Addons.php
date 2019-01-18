@@ -199,16 +199,15 @@ abstract class Addons
      * @access public
      * @param string $content 内容
      * @param array $vars 模板输出变量
-     * @param array $replace 替换内容
      * @param array $config 模板参数
      * @return mixed
      */
-    public function display($content, $vars = [], $replace = [], $config = [])
+    public function display($content, $vars = [], $config = [])
     {
         // 关闭模板布局
         $this->view->engine->layout(false);
 
-        echo $this->view->display($content, $vars, $replace, $config);
+        echo $this->view->display($content, $vars, $config);
     }
 
     /**

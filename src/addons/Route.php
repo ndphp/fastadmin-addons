@@ -38,13 +38,13 @@ class Route
             if (!$info['state']) {
                 throw new HttpException(500, __('addon %s is disabled', $addon));
             }
-            $dispatch = $request->dispatch();
-            if (isset($dispatch['var']) && $dispatch['var']) {
-                //$request->route($dispatch['var']);
-            }
+            // $dispatch = $request->dispatch();
+            // if (isset($dispatch['var']) && $dispatch['var']) {
+            //     //$request->route($dispatch['var']);
+            // }
 
             // 设置当前请求的控制器、操作
-            $request->controller($controller)->action($action);
+            // $request->controller($controller)->action($action);
 
             // 监听addon_module_init
             Hook::listen('addon_module_init', $request);

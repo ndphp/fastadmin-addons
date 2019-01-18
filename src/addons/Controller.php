@@ -9,6 +9,17 @@ use think\facade\Lang;
 use think\Loader;
 use think\Request;
 
+function object_array($array) {
+    if(is_object($array)) {
+        $array = (array)$array;
+    }
+    if(is_array($array)) {
+        foreach($array as $key=>$value) {
+            $array[$key] = object_array($value);
+        }
+    }
+    return $array;
+}
 /**
  * 插件基类控制器
  * @package think\addons
@@ -66,7 +77,7 @@ class Controller extends \think\Controller
         $filter = $convert ? 'strtolower' : 'trim';
         // 处理路由参数
         $param = $this->request->param();
-        $dispatch = $this->request->dispatch();
+        $dispatch = $this->request->dispatch()->getDispatch();
         $var = isset($dispatch['var']) ? $dispatch['var'] : [];
         $var = array_merge($param, $var);
         if (isset($dispatch['method']) && substr($dispatch['method'][0], 0, 7) == "\\addons")
@@ -91,7 +102,7 @@ class Controller extends \think\Controller
         Config::set('template.view_path', ADDON_PATH . $this->addon . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR);
 
         // 父类的调用必须放在设置模板路径之后
-        parent::__construct($this->request);
+        parent::__construct();
     }
 
     protected function initialize()
@@ -106,8 +117,8 @@ class Controller extends \think\Controller
         ]);
 
         // 设置替换字符串
-        $cdnurl = Config::get('site.cdnurl');
-        $this->view->replace('__ADDON__', $cdnurl . "/assets/addons/" . $this->addon);
+        Config::set('template.tpl_replace_string.__ADDON__', Config::get('site.cdnurl') . "/assets/addons/" . $this->addon);
+        $this->view->config(Config::get('template.'));
 
         $this->auth = Auth::instance();
         // token
@@ -153,13 +164,13 @@ class Controller extends \think\Controller
 
         $this->view->assign('user', $this->auth->getUser());
 
-        $site = Config::get("site");
+        $site = Config::get("site.");
 
         $upload = \app\common\model\Config::upload();
 
         // 上传信息配置后
         Hook::listen("upload_config_init", $upload);
-        Config::set('upload', array_merge(Config::get('upload'), $upload));
+        Config::set('upload', array_merge(Config::get('upload.'), $upload));
 
         // 加载当前控制器语言包
         $this->assign('site', $site);
@@ -170,11 +181,10 @@ class Controller extends \think\Controller
      * @access protected
      * @param string $template 模板文件名
      * @param array $vars 模板输出变量
-     * @param array $replace 模板替换
      * @param array $config 模板参数
      * @return mixed
      */
-    protected function fetch($template = '', $vars = [], $replace = [], $config = [])
+    protected function fetch($template = '', $vars = [], $config = [])
     {
         $controller = Loader::parseName($this->controller);
         if ('think' == strtolower(Config::get('template.type')) && $controller && 0 !== strpos($template, '/'))
@@ -191,7 +201,7 @@ class Controller extends \think\Controller
                 $template = str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . $template;
             }
         }
-        return parent::fetch($template, $vars, $replace, $config);
+        return parent::fetch($template, $vars, $config);
     }
 
 }
